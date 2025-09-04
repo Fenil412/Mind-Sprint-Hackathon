@@ -10,7 +10,6 @@ import {
     deleteUser,
     updateUserAvatar,
     updateUserCoverImage,
-    getUserChannelProfile,
     getReadHistory,
     updateAccountDetails
 } from "../controllers/user.controller.js";
@@ -45,9 +44,6 @@ router.route("/read-history").get(getReadHistory)
 // Avatar and cover image routes
 router.route("/avatar").patch(upload.single("avatar"), updateUserAvatar)
 router.route("/cover-image").patch(upload.single("coverImage"), updateUserCoverImage)
-
-// User profile routes
-router.route("/profile/:username").get(getUserChannelProfile)
 
 // Admin routes
 router.route("/delete/:id").delete(isAdmin, deleteUser)

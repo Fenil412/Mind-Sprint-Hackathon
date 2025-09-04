@@ -5,7 +5,7 @@ import { useToast } from "../components/ui/use-toast";
 
 // Configure axios defaults
 axios.defaults.baseURL =
-  import.meta.env.VITE_API_BASE_URL || "https://blogging-platform-x0sp.onrender.com/";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 axios.defaults.withCredentials = true; // Important for cookies
 axios.defaults.timeout = 10000;
 
@@ -307,30 +307,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const getUserChannelProfile = async (username) => {
-    try {
-      const response = await axios.get(`/api/v1/users/profile/${username}`);
-
-      if (response.data.success) {
-        return {
-          success: true,
-          data: response.data.data,
-        };
-      }
-
-      return {
-        success: false,
-        message: "Failed to fetch channel profile",
-      };
-    } catch (error) {
-      console.error("Failed to fetch channel profile:", error);
-      return {
-        success: false,
-        message:
-          error.response?.data?.message || "Failed to fetch channel profile",
-      };
-    }
-  };
+  
 
   const getReadHistory = async () => {
     try {
@@ -441,7 +418,6 @@ export function AuthProvider({ children }) {
     updateAvatar,
     deleteAccount,
     updateCoverImage,
-    getUserChannelProfile,
     getReadHistory,
     checkAuthStatus,
   };

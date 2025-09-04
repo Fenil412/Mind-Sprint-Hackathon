@@ -24,7 +24,6 @@ const Settings = () => {
     updateAvatar,
     deleteAccount,
     updateCoverImage,
-    getUserChannelProfile,
     getReadHistory,
     checkAuthStatus,
     refreshToken,
@@ -34,7 +33,6 @@ const Settings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [readHistory, setReadHistory] = useState([]);
-  const [channelProfile, setChannelProfile] = useState(null);
 
   // Profile form state
   const [profileForm, setProfileForm] = useState({
@@ -81,24 +79,10 @@ const Settings = () => {
 
   // Load channel profile and read history
   useEffect(() => {
-    if (user && activeTab === "channel") {
-      loadChannelProfile();
-    }
     if (user && activeTab === "history") {
       loadReadHistory();
     }
   }, [user, activeTab]);
-
-  const loadChannelProfile = async () => {
-    setIsLoading(true);
-    const result = await getUserChannelProfile(user.username);
-    if (result.success) {
-      setChannelProfile(result.data);
-    } else {
-      setMessage({ type: "error", text: result.message });
-    }
-    setIsLoading(false);
-  };
 
   const loadReadHistory = async () => {
     setIsLoading(true);
@@ -255,7 +239,6 @@ const Settings = () => {
     { id: "profile", label: "Profile", icon: User },
     { id: "password", label: "Password", icon: Lock },
     { id: "media", label: "Media", icon: Image },
-    { id: "channel", label: "Channel", icon: Camera },
     { id: "history", label: "History", icon: History },
     { id: "account", label: "Account", icon: User },
   ];
@@ -753,88 +736,6 @@ const Settings = () => {
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* Channel Tab */}
-          {activeTab === "channel" && (
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
-                Channel Profile
-              </h2>
-              {isLoading ? (
-                <div className="flex justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
-                </div>
-              ) : channelProfile ? (
-                <div className="space-y-6">
-                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <h3 className="font-medium text-gray-900 dark:text-white">
-                          Channel Stats
-                        </h3>
-                        <dl className="mt-4 space-y-2">
-                          <div className="flex justify-between">
-                            <dt className="text-gray-600 dark:text-gray-400">
-                              Followers:
-                            </dt>
-                            <dd className="font-medium text-gray-900 dark:text-white">
-                              {channelProfile.followersCount || 0}
-                            </dd>
-                          </div>
-                          <div className="flex justify-between">
-                            <dt className="text-gray-600 dark:text-gray-400">
-                              Following:
-                            </dt>
-                            <dd className="font-medium text-gray-900 dark:text-white">
-                              {channelProfile.followingCount || 0}
-                            </dd>
-                          </div>
-                        </dl>
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-gray-900 dark:text-white">
-                          Channel Info
-                        </h3>
-                        <dl className="mt-4 space-y-2">
-                          <div>
-                            <dt className="text-gray-600 dark:text-gray-400">
-                              Username:
-                            </dt>
-                            <dd className="font-medium text-gray-900 dark:text-white">
-                              @{channelProfile.username}
-                            </dd>
-                          </div>
-                          <div>
-                            <dt className="text-gray-600 dark:text-gray-400">
-                              Full Name:
-                            </dt>
-                            <dd className="font-medium text-gray-900 dark:text-white">
-                              {channelProfile.fullName}
-                            </dd>
-                          </div>
-                          <div>
-                            <dt className="text-gray-600 dark:text-gray-400">
-                              Email:
-                            </dt>
-                            <dd className="font-medium text-gray-900 dark:text-white">
-                              {channelProfile.email}
-                            </dd>
-                          </div>
-                        </dl>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <Camera className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                  <p className="text-gray-500 dark:text-gray-400">
-                    No channel profile data available
-                  </p>
-                </div>
-              )}
             </div>
           )}
 

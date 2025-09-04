@@ -23,7 +23,7 @@ export default function VerifyOtpPage() {
 
     if (result.success) {
       toast({ title: "OTP Verified", description: "Signed in successfully." })
-      navigate("/dashboard")
+      navigate("/settings")
     } else {
       toast({ variant: "destructive", title: "Invalid OTP", description: result.message })
     }

@@ -447,71 +447,7 @@ const deleteUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "User account deleted"))
 })
 
-const getUserChannelProfile = asyncHandler(async (req, res) => {
-    const { username } = req.params
 
-    if (!username?.trim()) {
-        throw new ApiError(400, "Username is required")
-    }
-
-    const channel = await User.aggregate([
-        { $match: { username: username.toLowerCase() } },
-        {
-            $lookup: {
-                from: "followers",
-                localField: "_id",
-                foreignField: "author",
-                as: "followers"
-            }
-        },
-        {
-            $lookup: {
-                from: "followers",
-                localField: "_id",
-                foreignField: "follower",
-                as: "following"
-            }
-        },
-        {
-            $addFields: {
-                followersCount: { $size: "$followers" },
-                followingCount: { $size: "$following" },
-                isFollowing: {
-                    $cond: {
-                        if: { $in: [req.user?._id, "$followers.follower"] },
-                        then: true,
-                        else: false
-                    }
-                }
-            }
-        },
-        {
-            $project: {
-                fullName: 1,
-                username: 1,
-                email: 1,
-                avatar: 1,
-                coverImage: 1,
-                bio: 1,
-                createdAt: 1,
-                followersCount: 1,
-                followingCount: 1,
-                isFollowing: 1,
-                website: 1,
-                location: 1,
-                socialLinks: 1
-            }
-        }
-    ])
-
-    if (!channel?.length) {
-        throw new ApiError(404, "Channel not found")
-    }
-
-    return res
-        .status(200)
-        .json(new ApiResponse(200, channel[0], "Channel profile fetched"))
-})
 
 const getReadHistory = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id)
@@ -547,6 +483,5 @@ export {
     deleteUser,
     generateAccessAndRefreshTokens,
     updateUserCoverImage,
-    getUserChannelProfile,
     getReadHistory
 }

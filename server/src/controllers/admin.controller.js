@@ -3,10 +3,6 @@ import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { User } from "../models/user.model.js"
 import { deleteFromCloudinary } from "../utils/cloudinary.js"
-import { Blog } from "../models/blog.model.js"
-import { Comment } from "../models/comment.model.js"
-import { Like } from "../models/like.model.js"
-import { Follower } from "../models/follower.model.js"
 import mongoose from "mongoose"
 
 // Get all users with pagination and filtering
@@ -58,18 +54,8 @@ const getUserById = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found")
   }
 
-  // Get additional stats
-  const [blogCount, commentCount, likeCount] = await Promise.all([
-    Blog.countDocuments({ author: id }),
-    Comment.countDocuments({ owner: id }),
-    Like.countDocuments({ likedBy: id }),
-  ])
-
   const userData = {
-    ...user.toObject(),
-    blogCount,
-    commentCount,
-    likeCount,
+    ...user.toObject()
   }
 
   return res.status(200).json(new ApiResponse(200, userData, "User details fetched"))
@@ -149,28 +135,16 @@ const deleteUser = asyncHandler(async (req, res) => {
     await deleteFromCloudinary(user.coverImage.public_id)
   }
 
-  // Delete user content
-  await Promise.all([
-    Blog.deleteMany({ author: id }),
-    Comment.deleteMany({ owner: id }),
-    Like.deleteMany({ likedBy: id }),
-    Follower.deleteMany({ $or: [{ follower: id }, { author: id }] }),
-  ])
-
   return res.status(200).json(new ApiResponse(200, {}, "User deleted successfully"))
 })
 
 // Enhanced platform statistics
 const getPlatformStats = asyncHandler(async (req, res) => {
-  const [totalUsers, adminUsers, activeUsers, suspendedUsers, blogs, comments, likes, followers] = await Promise.all([
+  const [totalUsers, adminUsers, activeUsers, suspendedUsers] = await Promise.all([
     User.countDocuments(),
     User.countDocuments({ role: "admin" }),
     User.countDocuments({ status: "active" }),
-    User.countDocuments({ status: "suspended" }),
-    Blog.countDocuments(),
-    Comment.countDocuments(),
-    Like.countDocuments(),
-    Follower.countDocuments(),
+    User.countDocuments({ status: "suspended" })
   ])
 
   const newUsers = await User.countDocuments({
@@ -184,40 +158,10 @@ const getPlatformStats = asyncHandler(async (req, res) => {
       active: activeUsers,
       suspended: suspendedUsers,
       new: newUsers,
-    },
-    content: {
-      blogs,
-      comments,
-      likes,
-    },
-    engagement: {
-      followers,
-    },
+    }
   }
 
   return res.status(200).json(new ApiResponse(200, stats, "Platform stats fetched"))
-})
-
-// Get recent platform activity
-const getRecentActivity = asyncHandler(async (req, res) => {
-  const [newUsers, newBlogs, newComments] = await Promise.all([
-    User.find().sort({ createdAt: -1 }).limit(5).select("username avatar createdAt"),
-    Blog.find().sort({ createdAt: -1 }).limit(5).select("title slug createdAt").populate("author", "username avatar"),
-    Comment.find()
-      .sort({ createdAt: -1 })
-      .limit(5)
-      .select("content createdAt")
-      .populate("owner", "username avatar")
-      .populate("blog", "title slug"),
-  ])
-
-  const activity = {
-    newUsers,
-    newBlogs,
-    newComments,
-  }
-
-  return res.status(200).json(new ApiResponse(200, activity, "Recent activity fetched"))
 })
 
 // Search users - Enhanced to work with getAllUsers
@@ -255,7 +199,6 @@ export {
   updateUser,
   deleteUser,
   getPlatformStats,
-  getRecentActivity,
   searchUsers,
   toggleUserStatus,
 }

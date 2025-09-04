@@ -8,7 +8,6 @@ export function AdminProvider({ children }) {
   const [users, setUsers] = useState([])
   const [userDetails, setUserDetails] = useState(null)
   const [platformStats, setPlatformStats] = useState(null)
-  const [recentActivity, setRecentActivity] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const { toast } = useToast()
@@ -199,28 +198,6 @@ export function AdminProvider({ children }) {
     }
   }
 
-  const getRecentActivity = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      const response = await axios.get("${import.meta.env.VITE_API_URL}/api/v1/admin/activity")
-
-      setRecentActivity(response.data.data)
-      return response.data
-    } catch (error) {
-      setError(error.response?.data?.message || "Failed to fetch recent activity")
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.response?.data?.message || "Failed to fetch recent activity",
-      })
-      throw error
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const searchUsers = async (searchQuery, page = 1, limit = 20) => {
     try {
       setLoading(true)
@@ -253,7 +230,6 @@ export function AdminProvider({ children }) {
     users,
     userDetails,
     platformStats,
-    recentActivity,
     loading,
     error,
     getAllUsers,
@@ -262,7 +238,6 @@ export function AdminProvider({ children }) {
     toggleUserStatus,
     deleteUser,
     getPlatformStats,
-    getRecentActivity,
     searchUsers,
     setUserDetails,
   }

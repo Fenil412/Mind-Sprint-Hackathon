@@ -5,7 +5,6 @@ import {
     updateUser,
     deleteUser,
     getPlatformStats,
-    getRecentActivity,
     searchUsers,
     toggleUserStatus
 } from "../controllers/admin.controller.js";
@@ -33,8 +32,5 @@ router.route('/users/:id/status')
 // Platform analytics
 router.route('/stats')
     .get(getPlatformStats);
-
-router.route('/activity')
-    .get(getRecentActivity);
 
 export default router;

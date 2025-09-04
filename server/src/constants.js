@@ -1,1 +1,1 @@
-export const DB_NAME = "BLOGGING-PLATFORM";
+export const DB_NAME = "Mined_Sprint";

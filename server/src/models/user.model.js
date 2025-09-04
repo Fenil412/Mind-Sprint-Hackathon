@@ -46,10 +46,6 @@ const userSchema = new Schema(
             url: String,
             public_id: String
         },
-        readHistory: [{
-            type: Schema.Types.ObjectId,
-            ref: "Blog"
-        }],
         password: {
             type: String,
             required: [true, 'Password is required'],
@@ -59,14 +55,6 @@ const userSchema = new Schema(
             type: String,
             enum: ['user', 'admin'],
             default: 'user'
-        },
-        followersCount: {
-            type: Number,
-            default: 0
-        },
-        followingCount: {
-            type: Number,
-            default: 0
         },
         refreshToken: {
             type: String
@@ -114,20 +102,6 @@ const userSchema = new Schema(
 )
 
 userSchema.plugin(mongoosePaginate);
-
-
-// Virtual for engagement rate
-userSchema.virtual('engagementRate').get(function () {
-    if (this.followersCount === 0) return 0;
-    return ((this.likesCount + this.commentsCount) / this.followersCount) * 100;
-});
-
-userSchema.virtual('blogs', {
-    ref: 'Blog',
-    localField: '_id',
-    foreignField: 'author',
-    justOne: false
-});
 
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();

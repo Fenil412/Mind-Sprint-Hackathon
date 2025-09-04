@@ -13,7 +13,7 @@ const uploadOnCloudinary = async (localFilePath) => {
         
         const response = await cloudinary.uploader.upload(localFilePath, {
             resource_type: "auto",
-            folder: "blogging-platform"
+            folder: "mined-sprint"
         });
         
         // Remove file from local server
